@@ -4,10 +4,11 @@ import os
 import sys
 from django.core.management.commands.runserver import Command as runserver
 
+
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'appointment_service.settings')
-    runserver.default_port = "8001"
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'stock_service.settings')
+    runserver.default_port = "8003"
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
