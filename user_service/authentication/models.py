@@ -64,11 +64,20 @@ class User(models.Model):
 
 
 class Account(AbstractBaseUser):
+    class RoleInAccount(models.TextChoices):
+        RECEOTIONIST = "REC", "receptionist"
+        PATIENT = "PAT", "patient"
+        DOCTOR = "DOC", "doctor"
+
+
     username = models.CharField(max_length=150, unique=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='account')
     is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    is_admin = models.BooleanField(default=False)
+    role = models.CharField(
+        max_length=3,
+        choices=RoleInAccount.choices,
+        default=RoleInAccount.PATIENT,
+    )
     
     objects = UserManager()
 

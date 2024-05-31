@@ -12,7 +12,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         token['uid'] = user.id
         token['username'] = user.username
-        token['is_admin'] = user.is_admin
+        token['role'] = user.role
 
         return token
 
