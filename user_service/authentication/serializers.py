@@ -4,6 +4,7 @@ from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
 from .models import User, Account, Fullname, Address
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from drf_extra_fields.fields import Base64ImageField
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -32,11 +33,11 @@ class AddressSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     fullname = FullnameSerializer()
     address = AddressSerializer()
+    image = Base64ImageField(required=False)
 
     class Meta:
         model = User
         fields = '__all__'
-        extra_kwargs = {'is_active': {'read_only': True}}
 
     def create(self, validated_data):
         fullname_data = validated_data.pop('fullname', None)
@@ -76,7 +77,7 @@ class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
         fields = ['username', 'password', 'user']
-        extra_kwargs = {'password': {'write_only': True}}
+        extra_kwargs = {'password': {'write_only': True}, 'is_active': {'read_only': True}}
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')

@@ -58,7 +58,8 @@ class User(models.Model):
     email = models.EmailField(unique=True)
     fullname = models.OneToOneField(Fullname, on_delete=models.SET_NULL, null=True, blank=True)
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True, blank=True)
-
+    image = models.ImageField(upload_to='images/')
+    
     def __str__(self):
         return self.email
 

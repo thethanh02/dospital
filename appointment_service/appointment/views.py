@@ -4,8 +4,10 @@ from rest_framework import viewsets, status, permissions
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView
+from rest_framework.pagination import PageNumberPagination
 from .models import Appointment
 from .serializers import AppointmentSerializer
+import requests
 
 class Health(APIView):
     permission_classes = [AllowAny,]
@@ -22,6 +24,27 @@ class ListCreateAppointmentAPIView(ListCreateAPIView):
     serializer_class = AppointmentSerializer
     queryset = Appointment.objects.all()
     permission_classes = [IsAuthenticated]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        
+        patient_ids = queryset.values_list('patient', flat=True).distinct()
+
+        headers = {'Authorization': request.headers.get('Authorization')}
+        user_service_url = 'http://0.0.0.0:8000/api/user/batch/'
+        response = requests.post(user_service_url, json={'user_ids': list(patient_ids)}, headers=headers)
+        
+        if response.status_code == 200:
+            patient_info = response.json()
+        else:
+            patient_info = {}
+        if page is not None:
+            serializer = self.get_serializer(page, many=True, context={'patient_info': patient_info})
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True, context={'patient_info': patient_info})
+        return Response(serializer.data)
 
     # def perform_create(self, serializer):
     #     # Assign the user who created the appointment
