@@ -7,6 +7,7 @@ from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIV
 from rest_framework.pagination import PageNumberPagination
 from .models import Appointment
 from .serializers import AppointmentSerializer
+from .filters import AppointmentFilter
 import requests
 
 class Health(APIView):
@@ -24,6 +25,7 @@ class ListCreateAppointmentAPIView(ListCreateAPIView):
     serializer_class = AppointmentSerializer
     queryset = Appointment.objects.all()
     permission_classes = [IsAuthenticated]
+    filterset_class = AppointmentFilter
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
