@@ -9,6 +9,7 @@ from .models import Appointment
 from .serializers import AppointmentSerializer
 from .filters import AppointmentFilter
 import requests
+from django.utils import timezone
 
 class Health(APIView):
     permission_classes = [AllowAny,]
@@ -23,9 +24,21 @@ class ProtectedView(APIView):
 
 class ListCreateAppointmentAPIView(ListCreateAPIView):
     serializer_class = AppointmentSerializer
-    queryset = Appointment.objects.all()
     permission_classes = [IsAuthenticated]
     filterset_class = AppointmentFilter
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role == 'PAT':
+            queryset = Appointment.objects.filter(patient=user.pk, appointment_time__gte=timezone.now()).order_by('appointment_time')
+        elif user.role == 'REC':
+            queryset = Appointment.objects.filter(appointment_time__gte=timezone.now()).order_by('appointment_time')
+        elif user.role == 'DOC':
+            queryset = Appointment.objects.filter(doctor=user.pk, appointment_time__gte=timezone.now()).order_by('appointment_time')
+        else:
+            queryset = Appointment.objects.all()
+
+        return queryset
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()

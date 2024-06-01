@@ -7,5 +7,6 @@ router.register(r'', views.UserViewSet)
 
 urlpatterns = [
     path('batch/', views.batch_user_info, name='batch-user-info'),
+    path('me/', views.get_me, name='me-info'),
     re_path(r'^', include(router.urls))
 ]
